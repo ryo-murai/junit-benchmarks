@@ -88,7 +88,12 @@ public final class Result
      */
     public Class<?> getTestClass()
     {
-        return this.description.getTestClass();
+        String targetClassName = getTestClassName();
+        try {
+            return Class.forName(targetClassName, true, Thread.currentThread().getContextClassLoader());
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(targetClassName + " not found", e);
+        }
     }
 
     /**
@@ -99,8 +104,9 @@ public final class Result
             return getTestClass().getMethod(getTestMethodName());
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException(
+                    "make sure [" +
                     getTestMethodName()
-                            + " is declared with required signature[public void no-arguments]",
+                            + "] is declared with required signature[public void no-arguments]",
                     e);
         }
     }
